@@ -1,63 +1,23 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoloNotes AI - Bản Pro Max</title>
-    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
-    <style>
-        body { background: #FFDEE9; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .box { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .chat { height: 300px; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px; padding: 10px; }
-        input { width: 70%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        button { padding: 10px; border-radius: 10px; background: #6B4EFF; color: white; border: none; cursor: pointer; }
-        .ai-msg { color: #6B4EFF; font-weight: bold; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <div id="chat" class="chat">Cưng ơi, tui nghe nè! Nói gì đi...</div>
-        <input type="text" id="inp" placeholder="Nhập đại cái gì đó...">
-        <button onclick="hoiAI()">Gửi</button>
-    </div>
+// Tìm chỗ hàm fetchGeminiAPI và dán đè cái này vào:
+async function fetchGeminiAPI(rawPrompt) {
+    const apikey = "DÁN_API_KEY_MỚI_CỦA_CƯNG_VÀO_ĐÂY"; // Lấy mã mới từ AI Studio nhen!
+    
+    // Tui dùng bản v1 cho chắc chắn, không dùng beta nữa
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apikey}`;
 
-    <script>
-        // DÁN MÃ PRO CỦA CƯNG VÀO ĐÂY NHA
-        const MY_KEY = "AIzaSyBguiessoOjSXzzM5BmZ4kd9Si3BSIg4Ng"; 
-
-        async function hoiAI() {
-            const txt = document.getElementById('inp').value;
-            if(!txt) return;
-            document.getElementById('chat').innerHTML += `<div><b>Bạn:</b> ${txt}</div>`;
-            document.getElementById('inp').value = "";
-
-            try {
-                // Tui dùng bản v1 cho nó chắc chắn không lỗi Model Not Found
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${MY_KEY}`;
-                
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: "Trả lời ngắn gọn, hài hước giọng miền Nam: " + txt }] }] })
-                });
-
-                const data = await res.json();
-                
-                if(data.error) {
-                    document.getElementById('chat').innerHTML += `<div class='ai-msg'>Lỗi: ${data.error.message}</div>`;
-                    return;
-                }
-
-                const reply = data.candidates[0].content.parts[0].text;
-                document.getElementById('chat').innerHTML += `<div class='ai-msg'>AI: ${reply}</div>`;
-                
-                // Bật mỏ nói luôn
-                responsiveVoice.speak(reply, "Vietnamese Female");
-
-            } catch(e) {
-                document.getElementById('chat').innerHTML += `<div class='ai-msg'>Vẫn kẹt lệnh, coi chừng cái Key bị Google khóa rồi cưng!</div>`;
-            }
-        }
-    </script>
-</body>
-</html>
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: "Bạn là trợ lý ảo miền Nam nanh nọc. Luôn trả lời bằng định dạng JSON: {\"reply\": \"câu trả lời\", \"item\": \"tên món\", \"price\": số_tiền}. User nói: " + rawPrompt }] }]
+            })
+        });
+        const data = await res.json();
+        const text = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("Lỗi rồi cưng:", err);
+        return null;
+    }
+}
