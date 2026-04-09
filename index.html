@@ -3,84 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoloNotes AI - Phiên Bản Đại Gia Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <title>HoloNotes V6 Pro Immortal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Responsive Voice cho Text-to-Speech -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <style>
-        :root { --main: #FFDEE9; --accent: #6B4EFF; --text: #2D3748; }
-        body { background: linear-gradient(135deg, #FFDEE9, #B5FFFC); min-height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Quicksand', sans-serif; margin: 0; }
-        .app-container { width: 95%; max-width: 400px; height: 85vh; background: rgba(255,255,255,0.7); backdrop-filter: blur(15px); border-radius: 30px; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 2px solid white; overflow: hidden; }
-        .header { padding: 20px; text-align: center; background: white; font-size: 20px; font-weight: 700; color: var(--accent); border-bottom: 1px solid #eee; }
-        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; position: relative; }
-        .user-msg { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
-        .ai-msg { background: white; color: var(--text); align-self: flex-start; border-bottom-left-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .input-bar { padding: 20px; background: white; display: flex; gap: 10px; }
-        input { flex: 1; border: 2px solid #eee; padding: 12px; border-radius: 15px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--accent); }
-        button { background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 15px; font-weight: 700; cursor: pointer; }
-        .loading { font-size: 12px; color: #718096; margin-top: 5px; display: none; }
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-dark: #1E293B;
+            --text-light: #64748B;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Inter', sans-serif;
+            height: 100%; width: 100%;
+            overflow: hidden;
+            color: var(--text-dark);
+        }
+
+        /* Animated Gradient Background */
+        body {
+            background: linear-gradient(-45deg, #FFDEE9, #B5FFFC, #D4C4FB, #FFDEE9);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Util */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 32px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Screen Management */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            transition: opacity 0.5s ease;
+            display: flex; flex-direction: column;
+            box-sizing: border-box;
+        }
+        .hidden {
+            opacity: 0; pointer-events: none; z-index: -1;
+        }
+        .active {
+            opacity: 1; pointer-events: auto; z-index: 10;
+        }
+
+        /* Landing Page */
+        #landing-page {
+            justify-content: center; align-items: center;
+            text-align: center;
+        }
+
+        .title-3d {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            margin-bottom: 50px;
+        }
+
+        .mic-btn-huge {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+            animation: pulse-ring 2s infinite;
+        }
+
+        .mic-btn-huge .material-icons-round {
+            font-size: 64px; color: var(--text-dark);
+            text-shadow: 0 4px 10px rgba(255,255,255,0.5);
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { box-shadow: 0 0 0 40px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        
+        .mic-recording {
+            animation: pulse-ring-red 1s infinite !important;
+        }
+        .mic-recording .material-icons-round { color: #f43f5e; }
+
+        @keyframes pulse-ring-red {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+            70% { box-shadow: 0 0 0 40px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        /* Workspace Page */
+        #workspace-page {
+            padding: 24px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+        header h1 { font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -1px;}
+        header p { margin: 4px 0 0; color: var(--text-light); font-weight: 600;}
+
+        /* Note Cards */
+        .note-list {
+            flex: 1; overflow-y: auto;
+            padding-bottom: 100px; /* Space for input */
+        }
+        .note-list::-webkit-scrollbar { display: none; }
+
+        .note-card {
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex; align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--text-light);
+            margin-right: 16px;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .note-card.done { opacity: 0.5; }
+        .note-card.done .checkbox {
+            background: var(--text-dark); border-color: var(--text-dark);
+        }
+        .note-card.done .checkbox::after {
+            content: '✓'; color: white; font-weight: bold; font-size: 14px;
+        }
+        .note-card.done .content {
+            text-decoration: line-through; color: var(--text-light);
+        }
+
+        .note-body { flex: 1; }
+        .note-body .content { font-size: 1.1rem; font-weight: 600; line-height: 1.5; margin: 0;}
+        .note-body .meta { font-size: 0.8rem; color: var(--text-light); margin-top: 6px; font-weight: 600; }
+        .meta-tag { background: rgba(59, 130, 246, 0.1); color: #2563EB; padding: 2px 8px; border-radius: 12px; margin-right: 8px;}
+
+        .delete-btn { cursor: pointer; color: var(--text-light); opacity: 0.5; }
+        .delete-btn:hover { opacity: 1; color: #f43f5e; }
+
+        /* Input Area */
+        .input-area {
+            position: fixed; bottom: 24px; left: 24px; right: 24px;
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .input-glass {
+            flex: 1; padding: 16px 24px;
+            border: none; outline: none; background: transparent;
+            font-size: 1rem; color: var(--text-dark); font-weight: 600;
+        }
+        .input-glass::placeholder { color: var(--text-light); }
+
+        .send-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+        }
+
+        .loading-toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 10px 20px; font-weight: bold; display: none;
+            z-index: 100;
+        }
+        .loading-toast.show { display: block; }
+
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">✨ HoloNotes AI Pro ✨</div>
-        <div class="chat-area" id="chatArea">
-            <div class="msg ai-msg">Chào đại gia nha! Nay có tiền đăng ký Pro rồi, tui sẽ phục vụ cưng hết mình. Tiêu gì khai mau?</div>
+
+    <div id="loading" class="glass loading-toast">Đang xử lý AI...</div>
+
+    <!-- Trang 1: Landing Page -->
+    <div id="landing-page" class="screen active">
+        <h1 class="title-3d" id="greeting-text">Hi! Muốn note gì đó cưng?</h1>
+        <div class="glass mic-btn-huge" id="main-mic-btn" onclick="startGlobalVoiceInput()">
+            <span class="material-icons-round">mic</span>
         </div>
-        <div id="loading" style="text-align:center; display:none; font-size:12px; color:purple;">Đang vặn não...</div>
-        <div class="input-bar">
-            <input type="text" id="userInput" placeholder="Hôm nay tui ăn bún bò 50k..." onkeypress="if(event.key==='Enter') send()">
-            <button onclick="send()">Gửi</button>
+        <p style="margin-top: 30px; font-weight: 600; opacity: 0.7; cursor: pointer;" onclick="goToWorkspace()">Chạm để vào danh sách note</p>
+    </div>
+
+    <!-- Trang 2: Workspace Page -->
+    <div id="workspace-page" class="screen hidden">
+        <header>
+            <h1>HoloNotes</h1>
+            <p id="current-date">Hôm nay</p>
+        </header>
+
+        <div class="note-list" id="note-container">
+            <!-- Thẻ HTML render qua JS -->
+        </div>
+
+        <div class="input-area">
+            <div class="glass" style="flex: 1; display: flex;">
+                <input type="text" class="input-glass" id="text-input" placeholder="Nhập việc cần làm..." onkeypress="handleKey(event)">
+            </div>
+            <!-- Nút gửi tay -->
+            <div class="glass send-btn" onclick="submitTextInput()">
+                <span class="material-icons-round">send</span>
+            </div>
+            <!-- Nút Mic -->
+            <div class="glass send-btn" id="workspace-mic-btn" onclick="startGlobalVoiceInput()">
+                <span class="material-icons-round">mic</span>
+            </div>
         </div>
     </div>
 
+    <!-- SCIPTS LÕI VOID -->
     <script>
-        // DÁN API KEY MỚI CỦA ĐẠI GIA VÀO ĐÂY
-        const API_KEY = "AIzaSyBPIAiIYCLnlLTus4dP5_o6vtKk_qvN2xw"; 
+        // CẤU HÌNH AI PRO
+        const AI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=AIzaSyBguiessoOjSXzzM5BmZ4kd9Si3BSIg4Ng";
+        const SYSTEM_PROMPT = `Bạn là trợ lý ảo nữ miền Nam nanh nọc, lầy lội, gọi 'cưng' xưng 'tui'. Trả về duy nhất JSON: {"reply": "câu khịa", "item": "việc/món đồ", "price": số_tiền_hoặc_0, "reminderTime": "thời_gian_iso8601_nếu_có"}`;
 
-        async function send() {
-            const input = document.getElementById('userInput');
-            const chat = document.getElementById('chatArea');
-            const load = document.getElementById('loading');
-            const text = input.value.trim();
-            if (!text) return;
+        let notes = [];
+        let isListening = false;
+        let recognition = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-            // Hiện tin nhắn user
-            chat.innerHTML += `<div class="msg user-msg">${text}</div>`;
-            input.value = "";
-            load.style.display = "block";
-            chat.scrollTop = chat.scrollHeight;
-
-            try {
-                // Sử dụng model 1.5-pro cho xịn
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Bạn là một trợ lý ảo miền Nam lầy lội, nanh nọc. User vừa nói: " + text + ". Hãy trả lời khịa họ một câu và nhắc lại số tiền nếu có." }] }]
-                    })
-                });
-
-                const data = await response.json();
-                const aiReply = data.candidates[0].content.parts[0].text;
-
-                // Hiện tin nhắn AI
-                load.style.display = "none";
-                chat.innerHTML += `<div class="msg ai-msg">${aiReply}</div>`;
-                chat.scrollTop = chat.scrollHeight;
-
-                // BẬT MỎ NÓI
-                if (window.responsiveVoice) {
-                    responsiveVoice.speak(aiReply, "Vietnamese Female", {rate: 1.1, pitch: 1});
-                }
-
-            } catch (error) {
-                load.style.display = "none";
-                chat.innerHTML += `<div class="msg ai-msg">Ôi trời, kẹt lệnh rồi! Coi lại cái mã API đi cưng ơi.</div>`;
+        // 1. Storage Manager (Lưu Song Song)
+        const StorageManager = {
+            saveLocal: function(dataArray) {
+                localStorage.setItem('holonotes_v6', JSON.stringify(dataArray));
+                this.syncToFirebase(dataArray); // Sync chìm
+            },
+            loadLocal: function() {
+                return JSON.parse(localStorage.getItem('holonotes_v6')) || [];
+            },
+            syncToFirebase: function(data) {
+                // Placeholder Firebase logic
+                console.log("[Firebase Placeholder] Đã đẩy dữ liệu xuyên không thành công!", data.length, "items");
             }
         }
+
+        // 2. Khởi tạo
+        function initApp() {
+            notes = StorageManager.loadLocal();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            renderNotes();
+            initSpeechAPI();
+        }
+
+        // Keng Sound Effect using Web Audio API (Sạch sẽ, không cần file ngoài)
+        function playKengSound() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // High pitch
+            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // 3. UI Renders
+        function renderNotes() {
+            const container = document.getElementById('note-container');
+            container.innerHTML = '';
+            notes.slice().reverse().forEach((note, reversedIndex) => {
+                const i = notes.length - 1 - reversedIndex; // Real index
+                const div = document.createElement('div');
+                div.className = `glass note-card ${note.is_done ? 'done' : ''}`;
+                
+                let metaText = `<span class="meta-tag">Ghi chú</span>`;
+                if(note.price > 0) metaText += `<span style="color:#f43f5e">${note.price.toLocaleString('vi-VN')} đ</span> `;
+                if(note.reminderTime) {
+                    const d = new Date(note.reminderTime);
+                    metaText += `⏰ ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')} ${d.getDate()}/${d.getMonth()+1}`;
+                }
+
+                div.innerHTML = `
+                    <div class="checkbox" onclick="toggleDone(${i})"></div>
+                    <div class="note-body">
+                        <p class="content">${note.item}</p>
+                        <div class="meta">${metaText}</div>
+                    </div>
+                    <div class="delete-btn material-icons-round" onclick="deleteNote(${i})">delete_outline</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleDone(index) {
+            notes[index].is_done = !notes[index].is_done;
+            StorageManager.saveLocal(notes);
+            renderNotes();
+        }
+
+        function deleteNote(index) {
+            notes.splice(index, 1);
+            StorageManager.saveLocal(notes);
+            renderNotes();
+        }
+
+        function goToWorkspace() {
+            document.getElementById('landing-page').classList.replace('active', 'hidden');
+            document.getElementById('workspace-page').classList.replace('hidden', 'active');
+        }
+
+        function toggleLoader(show) {
+            const el = document.getElementById('loading');
+            show ? el.classList.add('show') : el.classList.remove('show');
+        }
+
+        // 4. Lõi Ghi Âm
+        function initSpeechAPI() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRec) { alert("Trình duyệt không hỗ trợ Web Speech API."); return; }
+            recognition = new SpeechRec();
+            recognition.lang = 'vi-VN';
+            recognition.continuous = false;
+            
+            recognition.onstart = () => { UI_setListeningState(true); };
+            recognition.onend = () => { UI_setListeningState(false); };
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                processUserInput(text);
+            };
+        }
+
+        function startGlobalVoiceInput() {
+            if(!recognition) return;
+            if(isListening) { recognition.stop(); }
+            else { recognition.start(); }
+        }
+
+        function UI_setListeningState(state) {
+            isListening = state;
+            const b1 = document.getElementById('main-mic-btn');
+            const b2 = document.getElementById('workspace-mic-btn');
+            if(state) {
+                b1.classList.add('mic-recording'); b2.classList.add('mic-recording');
+                document.getElementById('greeting-text').innerText = "Đang rình nghe cưng nói...";
+            } else {
+                b1.classList.remove('mic-recording'); b2.classList.remove('mic-recording');
+                document.getElementById('greeting-text').innerText = "Hi! Muốn note gì đó cưng?";
+            }
+        }
+
+        // 5. Submit tay
+        function handleKey(e) { if(e.key === 'Enter') submitTextInput(); }
+        function submitTextInput() {
+            const val = document.getElementById('text-input').value.trim();
+            if(val) {
+                document.getElementById('text-input').value = '';
+                processUserInput(val);
+            }
+        }
+
+        // 6. Xử lý Logic AI (Auto-check & Gemini API)
+        async function processUserInput(inputStr) {
+            goToWorkspace(); // Nhảy trang nếu đang đứng ở Home
+            
+            const lowerStr = inputStr.toLowerCase();
+            
+            // Xử lý XONG / HOÀN THÀNH cự ly gần nhanh nhất
+            if(lowerStr.includes("xong") || lowerStr.includes("rồi") || lowerStr.includes("đã hoàn thành")) {
+                const target = lowerStr.replace("đã hoàn thành", "").replace("xong", "").replace("rồi", "").replace("đã", "").trim();
+                let found = false;
+                for(let i=0; i<notes.length; i++) {
+                    if(!notes[i].is_done && target && notes[i].item.toLowerCase().includes(target)) {
+                        notes[i].is_done = true; found = true;
+                        StorageManager.saveLocal(notes); renderNotes();
+                        responsiveVoice.speak("Ok, đã tích gạch ngang cho cưng rồi đó nha!", "Vietnamese Female");
+                        break;
+                    }
+                }
+                if(found) return; // Nếu tìm thấy thì dứt luôn
+            }
+
+            // Gọi API Gemini
+            toggleLoader(true);
+            try {
+                const res = await fetch(AI_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                        contents: [{ parts: [{ text: `Câu nói: "${inputStr}"` }] }]
+                    })
+                });
+                const data = await res.json();
+                
+                let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+                rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                
+                const aiResult = JSON.parse(rawText);
+                
+                // Add note
+                notes.push({
+                    id: Date.now(),
+                    item: aiResult.item || inputStr,
+                    price: aiResult.price || 0,
+                    reminderTime: aiResult.reminderTime || null,
+                    is_done: false,
+                    createdAt: new Date().toISOString()
+                });
+                StorageManager.saveLocal(notes);
+                renderNotes();
+
+                // TTS nanh nọc
+                if(aiResult.reply) {
+                    responsiveVoice.speak(aiResult.reply, "Vietnamese Female");
+                }
+
+                // Phát tiếng "Keng" nếu có ghi nhận tiền bạc hoặc add thành công!
+                setTimeout(() => playKengSound(), 500);
+
+            } catch (err) {
+                console.error(err);
+                // Fallback cứu hộ
+                notes.push({ id: Date.now(), item: inputStr, price: 0, is_done: false, createdAt: new Date().toISOString() });
+                StorageManager.saveLocal(notes);
+                renderNotes();
+
+                // Lên tiếng chửi khi hết Quota AI
+                responsiveVoice.speak("Ê hết tiền nuôi tui rồi hả cưng, mạng chập cheng tui lưu đại vô sổ luôn á nha!", "Vietnamese Female");
+                setTimeout(() => playKengSound(), 500);
+            }
+            toggleLoader(false);
+        }
+
+        // Bùmm
+        window.onload = initApp;
+
     </script>
 </body>
 </html>
