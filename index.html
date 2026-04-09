@@ -329,7 +329,19 @@ JSON duy nhất:
 { "reply_speech": "...", "extracted_notes": [], "extracted_finances": [], "is_duplicate": false, "is_missing_amount": false }`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apikey}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                :generateContent?key=${apikey}`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ contents: [{ parts: [{ text: sysPrompt }] }] })
                 });
