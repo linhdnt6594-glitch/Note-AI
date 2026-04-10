@@ -61,6 +61,7 @@
         /* Header */
         header { padding: 60px 24px 15px; }
         h1 { font-size: 38px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .slogan { color: var(--text-muted); font-size: 15px; font-weight: 500; margin-top: 8px; margin-bottom: 0px; }
 
         /* View Section Transitions */
         .view-section { 
@@ -74,25 +75,9 @@
             to { opacity: 1; transform: scale(1) translateY(0); } 
         }
 
-        .category-section { margin: 32px 24px 0; }
-        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .category-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-
-        /* Soft Add Button */
-        .add-quick-btn {
-            background: var(--accent-light);
-            border: none; color: var(--accent-color);
-            border-radius: 20px; padding: 6px 14px;
-            font-size: 14px; font-weight: 600;
-            cursor: pointer; display: flex; align-items: center; gap: 4px;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .add-quick-btn:active { transform: scale(0.95); }
-        .add-quick-btn .material-icons-round { font-size: 18px; }
-
         /* Note Cards */
-        .note-list { display: flex; flex-direction: column; gap: 14px; }
-        .note-empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 15px; background: transparent; }
+        .note-list { display: flex; flex-direction: column; gap: 14px; padding: 15px 24px 24px; }
+        .note-empty { padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 16px; font-weight: 500; background: transparent; }
 
         .note-item {
             background: var(--card-bg);
@@ -152,21 +137,37 @@
         }
         .delete-btn:active { transform: scale(0.9); }
 
-        /* Floating Action Button */
-        .fab-btn {
+        /* FAB Container: Mic + Add */
+        .fab-container {
             position: fixed; bottom: 110px;
-            left: calc(50% + 220px); transform: translateX(-50%);
+            left: calc(50% + 230px); transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 14px; align-items: center;
+            z-index: 150; transition: transform 0.3s;
+        }
+        @media (max-width: 640px) {
+            .fab-container { left: auto; right: 24px; transform: none; }
+        }
+
+        .fab-btn {
             width: 60px; height: 60px; border-radius: 50%;
             background: var(--accent-color); color: white;
             display: flex; justify-content: center; align-items: center;
             box-shadow: 0 10px 25px rgba(0,122,255,0.4);
-            cursor: pointer; z-index: 150; transition: transform 0.2s, box-shadow 0.2s;
-        }
-        @media (max-width: 640px) {
-            .fab-btn { left: auto; right: 24px; transform: none; }
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: none; outline: none;
         }
         .fab-btn:active { transform: scale(0.9); }
         .fab-btn .material-icons-round { font-size: 32px; }
+
+        .fab-mic {
+            background: var(--card-bg); color: var(--accent-color); 
+            width: 48px; height: 48px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .dark-mode .fab-mic { box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .fab-mic .material-icons-round { font-size: 24px; }
+        
+        .fab-mic.recording {
+            animation: pulse-red 1s infinite alternate; background: #FF3B30; color: white;
+        }
 
         /* Tab Bar - Centered & Minimal */
         .tab-bar {
@@ -236,42 +237,18 @@
 
         .modal-content { padding: 24px 20px; }
         .modal-title { font-weight: 700; font-size: 19px; margin: 0 0 10px; }
-        .modal-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 20px; font-weight: 500;}
 
         .modal-input {
-            width: 100%; box-sizing: border-box; padding: 12px 14px;
-            border: 1px solid var(--border-color); border-radius: 12px;
+            width: 100%; box-sizing: border-box; padding: 16px;
+            border: 1px solid var(--border-color); border-radius: 16px;
             font-size: 16px; font-family: inherit; font-weight: 500;
             background: var(--bg-color); color: var(--text-main); outline: none;
             transition: border-color 0.2s;
         }
         .modal-input:focus { border-color: var(--accent-color); }
 
-        .modal-select {
-            width: 100%; box-sizing: border-box; padding: 12px 14px; margin-top: 14px;
-            border: 1px solid var(--border-color); border-radius: 12px;
-            font-size: 16px; font-family: inherit; font-weight: 500;
-            background: var(--bg-color); color: var(--text-main); outline: none;
-        }
-
-        .mic-wrapper {
-            margin-top: 20px; display: flex; justify-content: center;
-        }
-        .mic-btn-main {
-            background: var(--accent-light); color: var(--accent-color);
-            width: 52px; height: 52px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            border: none; cursor: pointer; transition: transform 0.2s, background 0.2s, color 0.2s;
-        }
-        .mic-btn-main:active { transform: scale(0.9); }
-        .mic-btn-main.recording {
-            animation: pulse-red 1s infinite alternate; background: rgba(255, 59, 48, 0.1); color: #FF3B30;
-        }
-
-        @keyframes pulse-red { 100% { transform: scale(1.1); } }
-
         .modal-actions {
-            display: flex; border-top: 0.5px solid var(--border-color);
+            display: flex; border-top: 0.5px solid var(--border-color); margin-top: 20px;
         }
         .modal-btn {
             flex: 1; padding: 16px; background: none; border: none;
@@ -290,7 +267,7 @@
             background: var(--text-main); color: var(--bg-color);
             padding: 12px 24px; border-radius: 30px; font-size: 15px; font-weight: 600;
             z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;
         }
         .toast.show { opacity: 1; }
     </style>
@@ -299,50 +276,28 @@
 
     <div id="app-container">
         
-        <div class="toast" id="toast">Ghi âm thành công!</div>
+        <div class="toast" id="toast">Thêm ghi chú thành công rồi nha Cưng!</div>
 
-        <!-- Floating Action Button -->
-        <div class="fab-btn" onclick="openAddModal('Personal')">
-            <span class="material-icons-round">add</span>
+        <!-- Floating Action Button Container -->
+        <div class="fab-container">
+            <button class="fab-btn fab-mic" id="fab-mic" onclick="startQuickVoice()">
+                <span class="material-icons-round">mic</span>
+            </button>
+            <button class="fab-btn" onclick="openAddModal()">
+                <span class="material-icons-round">add</span>
+            </button>
         </div>
 
         <!-- HOME VIEW -->
         <div id="home-view" class="view-section active">
             <header>
                 <h1 id="greeting">Ghi chú</h1>
+                <p class="slogan">Năng lượng tích cực, công việc hiệu quả</p>
             </header>
 
-            <!-- Work Section -->
-            <div class="category-section">
-                <div class="category-header">
-                    <span class="category-title">Work</span>
-                    <button class="add-quick-btn" onclick="openAddModal('Work')">
-                        <span class="material-icons-round">add</span> Thêm
-                    </button>
-                </div>
-                <div class="note-list" id="list-Work"></div>
-            </div>
-
-            <!-- Study Section -->
-            <div class="category-section">
-                <div class="category-header">
-                    <span class="category-title">Study</span>
-                    <button class="add-quick-btn" onclick="openAddModal('Study')">
-                        <span class="material-icons-round">add</span> Thêm
-                    </button>
-                </div>
-                <div class="note-list" id="list-Study"></div>
-            </div>
-
-            <!-- Personal Section -->
-            <div class="category-section">
-                <div class="category-header">
-                    <span class="category-title">Personal</span>
-                    <button class="add-quick-btn" onclick="openAddModal('Personal')">
-                        <span class="material-icons-round">add</span> Thêm
-                    </button>
-                </div>
-                <div class="note-list" id="list-Personal"></div>
+            <!-- Unified List Section -->
+            <div class="note-list" id="list-All">
+                <!-- Notes injected here -->
             </div>
         </div>
 
@@ -360,7 +315,7 @@
                     </label>
                 </div>
             </div>
-            <p style="text-align:center; color: var(--text-muted); font-size: 13px; margin-top:30px; font-weight:500;">Phiên bản 3.0 - Premium Magic</p>
+            <p style="text-align:center; color: var(--text-muted); font-size: 13px; margin-top:30px; font-weight:500;">Phiên bản 4.0 - Premium Magic (Voice Ready)</p>
         </div>
 
         <!-- TAB BAR -->
@@ -376,23 +331,12 @@
             </div>
         </div>
 
-        <!-- ADD NOTE MODAL -->
+        <!-- ADD NOTE MODAL (Manual Typing) -->
         <div class="modal-overlay" id="add-modal">
             <div class="modal-card">
                 <div class="modal-content">
                     <p class="modal-title">Ghi chú mới</p>
-                    <p class="modal-desc" id="mic-status">Nhập chữ hoặc dùng giọng nói</p>
                     <input type="text" id="note-input" class="modal-input" placeholder="Nội dung ghi chú..." autocomplete="off">
-                    <select id="note-category" class="modal-select">
-                        <option value="Work">Work</option>
-                        <option value="Study">Study</option>
-                        <option value="Personal">Personal</option>
-                    </select>
-                    <div class="mic-wrapper">
-                        <button class="mic-btn-main" id="mic-btn" onclick="toggleVoice()">
-                            <span class="material-icons-round">mic</span>
-                        </button>
-                    </div>
                 </div>
                 <div class="modal-actions">
                     <button class="modal-btn destructive" onclick="closeModal()">Hủy</button>
@@ -407,23 +351,18 @@
         // State
         let notes = [];
         let isDarkMode = false;
-
-        // Tracking newly added notes to animate just them
         window.lastAddedNoteId = null;
-
-        // Voice recognition
+        
         let recognition = null;
         let isRecording = false;
 
         // Init App
         function initApp() {
-            // Load Notes
             const savedNotes = localStorage.getItem('clean_notes');
             if (savedNotes) {
                 notes = JSON.parse(savedNotes);
             }
             
-            // Load Dark Mode Preference
             const savedTheme = localStorage.getItem('clean_notes_theme');
             if (savedTheme === 'dark') {
                 isDarkMode = true;
@@ -431,7 +370,7 @@
                 document.getElementById('dark-mode-toggle').checked = true;
             }
 
-            renderAllCategories(true);
+            renderAllNotes(true);
             initSpeech();
         }
 
@@ -455,12 +394,11 @@
 
             // Toggle FAB visibility
             if(tab === 'settings') {
-                document.querySelector('.fab-btn').style.transform = 'scale(0)';
+                document.querySelector('.fab-container').style.transform = 'scale(0)';
             } else {
-                document.querySelector('.fab-btn').style.transform = 'translateX(-50%) scale(1)';
-                // handle mobile fab reset
+                document.querySelector('.fab-container').style.transform = 'translateX(-50%) scale(1)';
                 if(window.innerWidth <= 640) {
-                    document.querySelector('.fab-btn').style.transform = 'scale(1)';
+                    document.querySelector('.fab-container').style.transform = 'scale(1)';
                 }
             }
         }
@@ -480,26 +418,18 @@
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 2500);
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        function renderAllCategories(animateAll = false) {
-            renderCategory('Work', animateAll);
-            renderCategory('Study', animateAll);
-            renderCategory('Personal', animateAll);
-        }
-
-        function renderCategory(category, animateAll = false) {
-            const container = document.getElementById(`list-${category}`);
-            const filteredNotes = notes.filter(n => n.category === category);
-            
+        function renderAllNotes(animateAll = false) {
+            const container = document.getElementById(`list-All`);
             container.innerHTML = '';
             
-            if (filteredNotes.length === 0) {
-                container.innerHTML = `<div class="note-empty">Chưa có ghi chú</div>`;
+            if (notes.length === 0) {
+                container.innerHTML = `<div class="note-empty">Cưng chưa tạo ghi chú nào cả. Nhấn phím (+) hoặc Mic để dùng nha!</div>`;
             } else {
-                // Sort by ID descending
-                filteredNotes.sort((a, b) => b.id - a.id).forEach((note, index) => {
+                // Sắp xếp id giảm dần (mới nhất lên trên)
+                notes.sort((a, b) => b.id - a.id).forEach((note, index) => {
                     const item = document.createElement('div');
                     item.className = `note-item ${note.done ? 'done' : ''}`;
                     
@@ -524,21 +454,22 @@
         }
 
         function toggleDone(id) {
+            // Đảo trạng thái trực tiếp, không tạo note mới.
             const idx = notes.findIndex(n => n.id === id);
             if (idx !== -1) {
                 notes[idx].done = !notes[idx].done;
                 saveData();
-                renderCategory(notes[idx].category);
+                renderAllNotes(false);
             }
         }
 
         function deleteNote(id) {
             const idx = notes.findIndex(n => n.id === id);
             if (idx !== -1) {
-                const cat = notes[idx].category;
                 notes.splice(idx, 1);
                 saveData();
-                renderCategory(cat);
+                renderAllNotes(false);
+                showToast("Đã xóa nha Cưng!");
             }
         }
 
@@ -546,95 +477,93 @@
             localStorage.setItem('clean_notes', JSON.stringify(notes));
         }
 
-        // --- Voice Logic ---
+        // --- Quick Voice Logic (No Modal Required) ---
         function initSpeech() {
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRec) {
                 recognition = new SpeechRec();
                 recognition.lang = 'vi-VN';
                 recognition.continuous = false;
-                recognition.interimResults = true; // Giúp mic phản hồi Realtime (chữ nổi lên lập tức khi đang nói)
+                recognition.interimResults = true;
                 
                 recognition.onstart = () => {
                     isRecording = true;
-                    document.getElementById('mic-btn').classList.add('recording');
-                    document.getElementById('mic-status').innerText = 'Đang nghe... (Lưu liền khi nói "xong")';
+                    document.getElementById('fab-mic').classList.add('recording');
+                    showToast("Cưng nói đi, hệ thống đang lắng nghe...");
                 };
                 
                 recognition.onresult = (e) => {
-                    let interimTranscript = '';
                     let finalTranscript = '';
-
                     for (let i = e.resultIndex; i < e.results.length; ++i) {
                         if (e.results[i].isFinal) {
                             finalTranscript += e.results[i][0].transcript;
-                        } else {
-                            interimTranscript += e.results[i][0].transcript;
                         }
                     }
                     
-                    // Hiển thị ngay lập tức từng chữ đang nói (Nhạy bén hơn)
-                    const currentText = finalTranscript || interimTranscript;
-                    if (currentText) {
-                        document.getElementById('note-input').value = currentText;
-                    }
-
-                    // Tích hợp siêu tốc: Tự động nhấn Save ngay khi phát hiện từ "XONG" trong câu vừa dứt
                     if (finalTranscript) {
                         const lowerText = finalTranscript.toLowerCase();
                         const isAutoDone = lowerText.includes("đã") || lowerText.includes("xong") || lowerText.includes("rồi");
                         
+                        const newId = Date.now();
+                        window.lastAddedNoteId = newId;
+
+                        notes.push({
+                            id: newId,
+                            text: finalTranscript.trim(),
+                            done: isAutoDone,
+                            timestamp: getFormattedTime()
+                        });
+                        
+                        saveData();
+                        renderAllNotes(false);
+                        
+                        recognition.stop();
+
                         if (isAutoDone) {
-                            recognition.stop();
-                            // Delay 0.4s để hiệu ứng chớp tắt mic êm ái trước khi xử lý
-                            setTimeout(() => {
-                                saveNoteFromModal();
-                            }, 400); 
+                            showToast("Cưng nói xong rồi, đã tự động đánh dấu hoàn thành nha!");
+                        } else {
+                            showToast("Lưu lời Cưng thành công rồi nha!");
                         }
                     }
                 };
 
                 recognition.onend = () => {
                     isRecording = false;
-                    document.getElementById('mic-btn').classList.remove('recording');
-                    document.getElementById('mic-status').innerText = 'Nhập chữ hoặc dùng giọng nói';
+                    document.getElementById('fab-mic').classList.remove('recording');
                 };
             }
         }
 
-        function toggleVoice() {
+        function startQuickVoice() {
             if (!recognition) {
-                alert("Trình duyệt không hỗ trợ Web Speech API.");
+                alert("Trình duyệt không hỗ trợ Web Speech API nha Cưng.");
                 return;
             }
             if (isRecording) {
                 recognition.stop();
             } else {
-                recognition.start();
+                try {
+                    recognition.start();
+                } catch(e) {}
             }
         }
 
-        // --- Modals ---
-        function openAddModal(defaultCategory) {
+        // --- Manual Typing Modal ---
+        function openAddModal() {
             const modal = document.getElementById('add-modal');
             document.getElementById('note-input').value = '';
-            document.getElementById('note-category').value = defaultCategory;
-            document.getElementById('mic-status').innerText = 'Nhập chữ hoặc dùng giọng nói';
             modal.classList.add('show');
             setTimeout(() => document.getElementById('note-input').focus(), 100);
         }
 
         function closeModal() {
             document.getElementById('add-modal').classList.remove('show');
-            if (isRecording && recognition) recognition.stop();
         }
 
         function saveNoteFromModal() {
             const text = document.getElementById('note-input').value.trim();
-            const category = document.getElementById('note-category').value;
             
             if (text) {
-                // Auto Complete logic
                 const lowerText = text.toLowerCase();
                 const isAutoDone = lowerText.includes("đã") || lowerText.includes("xong") || lowerText.includes("rồi");
 
@@ -644,18 +573,17 @@
                 notes.push({
                     id: newId,
                     text: text,
-                    category: category,
                     done: isAutoDone,
                     timestamp: getFormattedTime()
                 });
                 
                 saveData();
-                renderCategory(category, false);
+                renderAllNotes(false);
                 
                 if (isAutoDone) {
-                    showToast("Tự động đánh dấu hoàn thành!");
+                    showToast("Cưng gõ xong rồi, đã tự động đánh dấu hoàn thành nha!");
                 } else {
-                    showToast("Đã lưu ghi chú mới!");
+                    showToast("Thêm ghi chú bằng tay thành công nha Cưng!");
                 }
             }
             closeModal();
