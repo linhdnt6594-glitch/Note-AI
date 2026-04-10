@@ -3,110 +3,638 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Clean Notes</title>
-    <!-- Thêm font Inter và Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Clean Notes Premium</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- Link tới file CSS bên ngoài -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Premium iOS Variables Light Mode */
+        :root {
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-main: #000000;
+            --text-muted: #8E8E93;
+            --accent-color: #007AFF; /* iOS Blue */
+            --accent-light: rgba(0, 122, 255, 0.1);
+            --border-color: #E5E5EA;
+            --tab-bg: rgba(255, 255, 255, 0.85);
+            --delete-bg: #FF3B30;
+            --shadow-card: 0 8px 24px rgba(0,0,0,0.04);
+        }
+        
+        /* Premium iOS Variables Dark Mode */
+        .dark-mode {
+            --bg-color: #000000;
+            --card-bg: #1C1C1E;
+            --text-main: #FFFFFF;
+            --text-muted: #8E8E93;
+            --accent-color: #0A84FF;
+            --accent-light: rgba(10, 132, 255, 0.15);
+            --border-color: #38383A;
+            --tab-bg: rgba(28, 28, 30, 0.85);
+            --shadow-card: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+            background: #E5E5EA; /* Exterior background for wider screens */
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dark-mode body { background: #000000; }
+
+        /* Centered Mobile Layout */
+        #app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-color);
+            position: relative;
+            padding-bottom: 110px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header { padding: 60px 24px 15px; }
+        h1 { font-size: 38px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+
+        /* View Section Transitions */
+        .view-section { 
+            display: none; 
+            animation: fadeInScale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); 
+        }
+        .view-section.active { display: block; }
+        #settings-view { padding: 24px; }
+        @keyframes fadeInScale { 
+            from { opacity: 0; transform: scale(0.97) translateY(10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+        
+        .category-section { margin: 32px 24px 0; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .category-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        
+        /* Soft Add Button */
+        .add-quick-btn {
+            background: var(--accent-light);
+            border: none; color: var(--accent-color);
+            border-radius: 20px; padding: 6px 14px;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .add-quick-btn:active { transform: scale(0.95); }
+        .add-quick-btn .material-icons-round { font-size: 18px; }
+        
+        /* Note Cards */
+        .note-list { display: flex; flex-direction: column; gap: 14px; }
+        .note-empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 15px; background: transparent; }
+        
+        .note-item {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 18px 20px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s, background 0.3s, box-shadow 0.3s, opacity 0.3s;
+        }
+        .note-item:active { transform: scale(0.98); }
+        .note-item.animate-enter {
+            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* iOS Checkbox */
+        .checkbox {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+            background: transparent;
+        }
+        .note-item.done { opacity: 0.6; box-shadow: none; }
+        .note-item.done .checkbox {
+            background: var(--accent-color); border-color: var(--accent-color);
+        }
+        .note-item.done .checkbox::after {
+            content: '✓'; color: white; font-size: 14px; font-weight: bold;
+            animation: popIn 0.3s cubic-bezier(0.2,0.8,0.2,1);
+        }
+        @keyframes popIn { 0%{transform:scale(0);} 100%{transform:scale(1);} }
+        
+        /* Note Content */
+        .note-content { flex: 1; min-width: 0; }
+        .note-text {
+            font-size: 17px; margin: 0; line-height: 1.4; font-weight: 500;
+            word-wrap: break-word; transition: color 0.2s;
+        }
+        .note-item.done .note-text {
+            color: var(--text-muted); text-decoration: line-through;
+        }
+        .note-time {
+            font-size: 13px; color: var(--text-muted); margin-top: 6px; font-weight: 500;
+        }
+        
+        /* Delete Button */
+        .delete-btn {
+            color: var(--delete-bg); cursor: pointer; padding: 8px;
+            background: rgba(255, 59, 48, 0.1); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .delete-btn:active { transform: scale(0.9); }
+
+        /* Floating Action Button */
+        .fab-btn {
+            position: fixed; bottom: 110px;
+            left: calc(50% + 220px); transform: translateX(-50%);
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--accent-color); color: white;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 25px rgba(0,122,255,0.4);
+            cursor: pointer; z-index: 150; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        @media (max-width: 640px) {
+            .fab-btn { left: auto; right: 24px; transform: none; }
+        }
+        .fab-btn:active { transform: scale(0.9); }
+        .fab-btn .material-icons-round { font-size: 32px; }
+
+        /* Tab Bar - Centered & Minimal */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 600px; height: 85px;
+            background: var(--tab-bg);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 0.5px solid var(--border-color);
+            display: flex; justify-content: space-evenly; align-items: flex-start;
+            padding-top: 12px; z-index: 100; box-sizing: border-box;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .tab-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-muted); cursor: pointer; width: 80px;
+            transition: color 0.2s;
+        }
+        .tab-item.active { color: var(--accent-color); }
+        .tab-item .material-icons-round { font-size: 28px; }
+        .tab-item .tab-label { font-size: 11px; font-weight: 600; margin-top: 4px; }
+
+        /* Settings View */
+        .settings-list {
+            background: var(--card-bg); border-radius: 20px; overflow: hidden;
+            box-shadow: var(--shadow-card); margin-top: 10px;
+        }
+        .settings-item {
+            padding: 18px 20px; border-bottom: 0.5px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 17px; font-weight: 500;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        
+        /* iOS Switch */
+        .switch { position: relative; display: inline-block; width: 51px; height: 31px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+            background-color: #E5E5EA; transition: .4s; border-radius: 31px; 
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; 
+            background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 3px 8px rgba(0,0,0,0.15); 
+        }
+        input:checked + .slider { background-color: #34C759; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .dark-mode .slider { background-color: #39393D; }
+        .dark-mode input:checked + .slider { background-color: #32D74B; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); opacity: 0; pointer-events: none;
+            transition: opacity 0.3s; z-index: 200;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: var(--card-bg); width: 320px;
+            border-radius: 24px; text-align: center;
+            transform: scale(1.1); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        
+        .modal-content { padding: 24px 20px; }
+        .modal-title { font-weight: 700; font-size: 19px; margin: 0 0 10px; }
+        .modal-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 20px; font-weight: 500;}
+
+        .modal-input {
+            width: 100%; box-sizing: border-box; padding: 12px 14px;
+            border: 1px solid var(--border-color); border-radius: 12px;
+            font-size: 16px; font-family: inherit; font-weight: 500;
+            background: var(--bg-color); color: var(--text-main); outline: none;
+            transition: border-color 0.2s;
+        }
+        .modal-input:focus { border-color: var(--accent-color); }
+        
+        .modal-select {
+            width: 100%; box-sizing: border-box; padding: 12px 14px; margin-top: 14px;
+            border: 1px solid var(--border-color); border-radius: 12px;
+            font-size: 16px; font-family: inherit; font-weight: 500;
+            background: var(--bg-color); color: var(--text-main); outline: none;
+        }
+
+        .mic-wrapper {
+            margin-top: 20px; display: flex; justify-content: center;
+        }
+        .mic-btn-main {
+            background: var(--accent-light); color: var(--accent-color);
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            border: none; cursor: pointer; transition: transform 0.2s, background 0.2s, color 0.2s;
+        }
+        .mic-btn-main:active { transform: scale(0.9); }
+        .mic-btn-main.recording {
+            animation: pulse-red 1s infinite alternate; background: rgba(255, 59, 48, 0.1); color: #FF3B30;
+        }
+
+        @keyframes pulse-red { 100% { transform: scale(1.1); } }
+
+        .modal-actions {
+            display: flex; border-top: 0.5px solid var(--border-color);
+        }
+        .modal-btn {
+            flex: 1; padding: 16px; background: none; border: none;
+            font-size: 17px; color: var(--accent-color); cursor: pointer;
+            border-right: 0.5px solid var(--border-color); transition: background 0.2s;
+            font-weight: 500;
+        }
+        .modal-btn:active { background: rgba(0,0,0,0.05); }
+        .dark-mode .modal-btn:active { background: rgba(255,255,255,0.05); }
+        .modal-btn:last-child { border-right: none; font-weight: 700; }
+        .modal-btn.destructive { color: #FF3B30; font-weight: 500; }
+
+        /* Toast Message */
+        .toast {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            background: var(--text-main); color: var(--bg-color);
+            padding: 12px 24px; border-radius: 30px; font-size: 15px; font-weight: 600;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; }
+    </style>
 </head>
 <body>
 
-    <div class="toast" id="toast">Ghi âm thành công!</div>
+    <div id="app-container">
+        
+        <div class="toast" id="toast">Ghi chú đã thêm!</div>
 
-    <!-- HOME VIEW -->
-    <div id="home-view">
-        <header>
-            <h1 id="greeting">Ghi chú</h1>
-        </header>
-
-        <!-- Work Section -->
-        <div class="category-section">
-            <div class="category-header">
-                <span class="category-title">Work</span>
-                <button class="add-quick-btn" onclick="openAddModal('Work')"><span class="material-icons-round">add</span></button>
-            </div>
-            <div class="note-list" id="list-Work"></div>
+        <!-- Floating Action Button -->
+        <div class="fab-btn" onclick="openAddModal('Personal')">
+            <span class="material-icons-round">add</span>
         </div>
 
-        <!-- Study Section -->
-        <div class="category-section">
-            <div class="category-header">
-                <span class="category-title">Study</span>
-                <button class="add-quick-btn" onclick="openAddModal('Study')"><span class="material-icons-round">add</span></button>
-            </div>
-            <div class="note-list" id="list-Study"></div>
-        </div>
+        <!-- HOME VIEW -->
+        <div id="home-view" class="view-section active">
+            <header>
+                <h1 id="greeting">Ghi chú</h1>
+            </header>
 
-        <!-- Personal Section -->
-        <div class="category-section">
-            <div class="category-header">
-                <span class="category-title">Personal</span>
-                <button class="add-quick-btn" onclick="openAddModal('Personal')"><span class="material-icons-round">add</span></button>
-            </div>
-            <div class="note-list" id="list-Personal"></div>
-        </div>
-    </div>
-
-    <!-- SETTINGS VIEW -->
-    <div id="settings-view">
-        <header style="padding: 30px 0 20px;">
-            <h1>Cài đặt</h1>
-        </header>
-        <div class="settings-list">
-            <div class="settings-item">
-                <span>Chế độ Tối (Dark Mode)</span>
-                <label class="switch">
-                    <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-        <p style="text-align:center; color: var(--text-muted); font-size: 13px; margin-top:20px;">Phiên bản 1.0 - Clean Notes</p>
-    </div>
-
-    <!-- TAB BAR -->
-    <div class="tab-bar">
-        <div class="tab-item active" id="tab-home" onclick="switchTab('home')">
-            <span class="material-icons-round">description</span>
-            <span class="tab-label">Home</span>
-        </div>
-        <div class="tab-item" onclick="openAddModal('Personal')">
-            <span class="material-icons-round">add_circle</span>
-            <span class="tab-label">Add</span>
-        </div>
-        <div class="tab-item" id="tab-settings" onclick="switchTab('settings')">
-            <span class="material-icons-round">settings</span>
-            <span class="tab-label">Settings</span>
-        </div>
-    </div>
-
-    <!-- ADD NOTE MODAL -->
-    <div class="modal-overlay" id="add-modal">
-        <div class="modal-card">
-            <div class="modal-content">
-                <p class="modal-title">Ghi chú mới</p>
-                <p class="modal-desc" id="mic-status">Nhập chữ hoặc dùng giọng nói</p>
-                <input type="text" id="note-input" class="modal-input" placeholder="Nội dung ghi chú..." autocomplete="off">
-                <select id="note-category" class="modal-select">
-                    <option value="Work">Work</option>
-                    <option value="Study">Study</option>
-                    <option value="Personal">Personal</option>
-                </select>
-                <div class="mic-wrapper">
-                    <button class="mic-btn-main" id="mic-btn" onclick="toggleVoice()">
-                        <span class="material-icons-round">mic</span>
+            <!-- Work Section -->
+            <div class="category-section">
+                <div class="category-header">
+                    <span class="category-title">Work</span>
+                    <button class="add-quick-btn" onclick="openAddModal('Work')">
+                        <span class="material-icons-round">add</span> Thêm
                     </button>
                 </div>
+                <div class="note-list" id="list-Work"></div>
             </div>
-            <div class="modal-actions">
-                <button class="modal-btn destructive" onclick="closeModal()">Hủy</button>
-                <button class="modal-btn" onclick="saveNoteFromModal()">Thêm</button>
+
+            <!-- Study Section -->
+            <div class="category-section">
+                <div class="category-header">
+                    <span class="category-title">Study</span>
+                    <button class="add-quick-btn" onclick="openAddModal('Study')">
+                        <span class="material-icons-round">add</span> Thêm
+                    </button>
+                </div>
+                <div class="note-list" id="list-Study"></div>
+            </div>
+
+            <!-- Personal Section -->
+            <div class="category-section">
+                <div class="category-header">
+                    <span class="category-title">Personal</span>
+                    <button class="add-quick-btn" onclick="openAddModal('Personal')">
+                        <span class="material-icons-round">add</span> Thêm
+                    </button>
+                </div>
+                <div class="note-list" id="list-Personal"></div>
             </div>
         </div>
-    </div>
 
-    <!-- Link tới file Javascript bên ngoài -->
-    <script src="script.js"></script>
+        <!-- SETTINGS VIEW -->
+        <div id="settings-view" class="view-section">
+            <header style="padding: 40px 0 20px;">
+                <h1>Cài đặt</h1>
+            </header>
+            <div class="settings-list">
+                <div class="settings-item">
+                    <span>Chế độ Tối</span>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <p style="text-align:center; color: var(--text-muted); font-size: 13px; margin-top:30px; font-weight:500;">Phiên bản 2.1 - Premium Transitions</p>
+        </div>
+
+        <!-- TAB BAR -->
+        <div class="tab-bar">
+            <div class="tab-item active" id="tab-home" onclick="switchTab('home')">
+                <span class="material-icons-round">description</span>
+                <span class="tab-label">Home</span>
+            </div>
+            <!-- Removed middle Add tab to keep it minimal, relying on FAB -->
+            <div class="tab-item" id="tab-settings" onclick="switchTab('settings')">
+                <span class="material-icons-round">settings</span>
+                <span class="tab-label">Settings</span>
+            </div>
+        </div>
+
+        <!-- ADD NOTE MODAL -->
+        <div class="modal-overlay" id="add-modal">
+            <div class="modal-card">
+                <div class="modal-content">
+                    <p class="modal-title">Ghi chú mới</p>
+                    <p class="modal-desc" id="mic-status">Nhập chữ hoặc dùng giọng nói</p>
+                    <input type="text" id="note-input" class="modal-input" placeholder="Nội dung ghi chú..." autocomplete="off">
+                    <select id="note-category" class="modal-select">
+                        <option value="Work">Work</option>
+                        <option value="Study">Study</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                    <div class="mic-wrapper">
+                        <button class="mic-btn-main" id="mic-btn" onclick="toggleVoice()">
+                            <span class="material-icons-round">mic</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn destructive" onclick="closeModal()">Hủy</button>
+                    <button class="modal-btn" onclick="saveNoteFromModal()">Thêm</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End App Container -->
+
+    <script>
+        // State
+        let notes = [];
+        let isDarkMode = false;
+        
+        // Tracking newly added notes to animate just them
+        window.lastAddedNoteId = null;
+
+        // Voice recognition
+        let recognition = null;
+        let isRecording = false;
+
+        // Init App
+        function initApp() {
+            // Load Notes
+            const savedNotes = localStorage.getItem('clean_notes');
+            if (savedNotes) {
+                notes = JSON.parse(savedNotes);
+            }
+            
+            // Load Dark Mode Preference
+            const savedTheme = localStorage.getItem('clean_notes_theme');
+            if (savedTheme === 'dark') {
+                isDarkMode = true;
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-toggle').checked = true;
+            }
+
+            renderAllCategories(true);
+            initSpeech();
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = document.getElementById('dark-mode-toggle').checked;
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('clean_notes_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('clean_notes_theme', 'light');
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('home-view').classList.toggle('active', tab === 'home');
+            document.getElementById('settings-view').classList.toggle('active', tab === 'settings');
+            
+            document.getElementById('tab-home').classList.toggle('active', tab === 'home');
+            document.getElementById('tab-settings').classList.toggle('active', tab === 'settings');
+
+            // Toggle FAB visibility
+            if(tab === 'settings') {
+                document.querySelector('.fab-btn').style.transform = 'scale(0)';
+            } else {
+                document.querySelector('.fab-btn').style.transform = 'translateX(-50%) scale(1)';
+                // handle mobile fab reset
+                if(window.innerWidth <= 640) {
+                    document.querySelector('.fab-btn').style.transform = 'scale(1)';
+                }
+            }
+        }
+
+        // --- Core Logic ---
+        function getFormattedTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            return `${hours}:${minutes}, ${day}/${month}/${year}`;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2500);
+        }
+
+        function renderAllCategories(animateAll = false) {
+            renderCategory('Work', animateAll);
+            renderCategory('Study', animateAll);
+            renderCategory('Personal', animateAll);
+        }
+
+        function renderCategory(category, animateAll = false) {
+            const container = document.getElementById(`list-${category}`);
+            const filteredNotes = notes.filter(n => n.category === category);
+            
+            container.innerHTML = '';
+            
+            if (filteredNotes.length === 0) {
+                container.innerHTML = `<div class="note-empty">Chưa có ghi chú</div>`;
+            } else {
+                // Sort by ID descending
+                filteredNotes.sort((a, b) => b.id - a.id).forEach((note, index) => {
+                    const item = document.createElement('div');
+                    item.className = `note-item ${note.done ? 'done' : ''}`;
+                    
+                    if (animateAll) {
+                        item.classList.add('animate-enter');
+                        item.style.animationDelay = `${index * 0.05}s`;
+                    } else if (note.id === window.lastAddedNoteId) {
+                        item.classList.add('animate-enter');
+                    }
+
+                    item.innerHTML = `
+                        <div class="checkbox" onclick="toggleDone(${note.id})"></div>
+                        <div class="note-content">
+                            <p class="note-text">${note.text}</p>
+                            <p class="note-time">${note.timestamp}</p>
+                        </div>
+                        <div class="delete-btn material-icons-round" onclick="deleteNote(${note.id})">delete</div>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function toggleDone(id) {
+            const idx = notes.findIndex(n => n.id === id);
+            if (idx !== -1) {
+                notes[idx].done = !notes[idx].done;
+                saveData();
+                renderCategory(notes[idx].category);
+            }
+        }
+
+        function deleteNote(id) {
+            const idx = notes.findIndex(n => n.id === id);
+            if (idx !== -1) {
+                const cat = notes[idx].category;
+                notes.splice(idx, 1);
+                saveData();
+                renderCategory(cat);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('clean_notes', JSON.stringify(notes));
+        }
+
+        // --- Voice Logic ---
+        function initSpeech() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRec) {
+                recognition = new SpeechRec();
+                recognition.lang = 'vi-VN';
+                recognition.continuous = false;
+                
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById('mic-btn').classList.add('recording');
+                    document.getElementById('mic-status').innerText = 'Đang nghe...';
+                };
+                
+                recognition.onresult = (e) => {
+                    const transcript = e.results[0][0].transcript;
+                    document.getElementById('note-input').value = transcript;
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    document.getElementById('mic-btn').classList.remove('recording');
+                    document.getElementById('mic-status').innerText = 'Nhập chữ hoặc dùng giọng nói';
+                };
+            }
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert("Trình duyệt không hỗ trợ Web Speech API.");
+                return;
+            }
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        // --- Modals ---
+        function openAddModal(defaultCategory) {
+            const modal = document.getElementById('add-modal');
+            document.getElementById('note-input').value = '';
+            document.getElementById('note-category').value = defaultCategory;
+            document.getElementById('mic-status').innerText = 'Nhập chữ hoặc dùng giọng nói';
+            modal.classList.add('show');
+            setTimeout(() => document.getElementById('note-input').focus(), 100);
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('show');
+            if (isRecording && recognition) recognition.stop();
+        }
+
+        function saveNoteFromModal() {
+            const text = document.getElementById('note-input').value.trim();
+            const category = document.getElementById('note-category').value;
+            
+            if (text) {
+                // Auto Complete logic
+                const lowerText = text.toLowerCase();
+                const isAutoDone = lowerText.includes("đã") || lowerText.includes("xong") || lowerText.includes("rồi");
+
+                const newId = Date.now();
+                window.lastAddedNoteId = newId;
+
+                notes.push({
+                    id: newId,
+                    text: text,
+                    category: category,
+                    done: isAutoDone,
+                    timestamp: getFormattedTime()
+                });
+                
+                saveData();
+                renderCategory(category, false);
+                
+                if (isAutoDone) {
+                    showToast("Tự động đánh dấu hoàn thành!");
+                } else {
+                    showToast("Đã lưu ghi chú mới!");
+                }
+            }
+            closeModal();
+            switchTab('home'); 
+        }
+
+        window.onload = initApp;
+
+    </script>
 </body>
 </html>
