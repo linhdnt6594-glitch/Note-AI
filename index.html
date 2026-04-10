@@ -6,14 +6,13 @@
     <title>HoloNotes V6 Pro Immortal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- Responsive Voice cho Text-to-Speech -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --text-dark: #1E293B;
-            --text-light: #64748B;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-dark: #0f172a;
+            --accent: #6366f1;
         }
 
         body, html {
@@ -24,11 +23,10 @@
             color: var(--text-dark);
         }
 
-        /* Animated Gradient Background */
         body {
-            background: linear-gradient(-45deg, #FFDEE9, #B5FFFC, #D4C4FB, #FFDEE9);
+            background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #fbc2eb, #a18cd1);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            animation: gradientBG 20s ease infinite;
         }
 
         @keyframes gradientBG {
@@ -37,418 +35,215 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Glassmorphism Util */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
 
-        /* Screen Management */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            transition: opacity 0.5s ease;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column;
-            box-sizing: border-box;
+            padding: 24px; box-sizing: border-box;
         }
-        .hidden {
-            opacity: 0; pointer-events: none; z-index: -1;
-        }
-        .active {
-            opacity: 1; pointer-events: auto; z-index: 10;
-        }
+
+        .hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .active { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
         /* Landing Page */
-        #landing-page {
-            justify-content: center; align-items: center;
-            text-align: center;
-        }
-
-        .title-3d {
-            font-size: 2.5rem;
-            font-weight: 800;
-            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
-            margin-bottom: 50px;
-        }
-
-        .mic-btn-huge {
-            width: 150px; height: 150px;
+        #landing-page { justify-content: center; align-items: center; text-align: center; }
+        
+        .mic-trigger {
+            width: 120px; height: 120px;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-            animation: pulse-ring 2s infinite;
+            cursor: pointer; transition: transform 0.3s ease;
         }
+        .mic-trigger:active { transform: scale(0.9); }
+        .mic-trigger i { font-size: 48px; }
 
-        .mic-btn-huge .material-icons-round {
-            font-size: 64px; color: var(--text-dark);
-            text-shadow: 0 4px 10px rgba(255,255,255,0.5);
-        }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-            70% { box-shadow: 0 0 0 40px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        
-        .mic-recording {
-            animation: pulse-ring-red 1s infinite !important;
-        }
-        .mic-recording .material-icons-round { color: #f43f5e; }
-
-        @keyframes pulse-ring-red {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-            70% { box-shadow: 0 0 0 40px rgba(244, 63, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-        }
-
-        /* Workspace Page */
-        #workspace-page {
-            padding: 24px;
-        }
-
-        header {
-            margin-bottom: 24px;
-        }
-        header h1 { font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -1px;}
-        header p { margin: 4px 0 0; color: var(--text-light); font-weight: 600;}
-
-        /* Note Cards */
-        .note-list {
-            flex: 1; overflow-y: auto;
-            padding-bottom: 100px; /* Space for input */
-        }
-        .note-list::-webkit-scrollbar { display: none; }
-
+        /* Workspace */
+        .note-list { flex: 1; overflow-y: auto; padding-top: 10px; }
         .note-card {
-            padding: 20px;
-            margin-bottom: 16px;
-            display: flex; align-items: center;
-            transition: all 0.3s ease;
+            padding: 16px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 15px;
+            animation: slideIn 0.4s ease forwards;
         }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
         .checkbox {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            border: 2px solid var(--text-light);
-            margin-right: 16px;
-            cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
+            width: 24px; height: 24px; border-radius: 8px;
+            border: 2px solid var(--accent); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
-        .note-card.done { opacity: 0.5; }
-        .note-card.done .checkbox {
-            background: var(--text-dark); border-color: var(--text-dark);
+        .done .checkbox { background: var(--accent); }
+        .done .checkbox::after { content: 'check'; font-family: 'Material Icons Round'; color: white; font-size: 18px; }
+        .done .note-text { text-decoration: line-through; opacity: 0.6; }
+
+        .input-bar {
+            display: flex; gap: 10px; margin-top: 10px;
         }
-        .note-card.done .checkbox::after {
-            content: '✓'; color: white; font-weight: bold; font-size: 14px;
-        }
-        .note-card.done .content {
-            text-decoration: line-through; color: var(--text-light);
+        .input-bar input {
+            flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 15px 20px; border-radius: 20px; outline: none; font-weight: 600;
         }
 
-        .note-body { flex: 1; }
-        .note-body .content { font-size: 1.1rem; font-weight: 600; line-height: 1.5; margin: 0;}
-        .note-body .meta { font-size: 0.8rem; color: var(--text-light); margin-top: 6px; font-weight: 600; }
-        .meta-tag { background: rgba(59, 130, 246, 0.1); color: #2563EB; padding: 2px 8px; border-radius: 12px; margin-right: 8px;}
-
-        .delete-btn { cursor: pointer; color: var(--text-light); opacity: 0.5; }
-        .delete-btn:hover { opacity: 1; color: #f43f5e; }
-
-        /* Input Area */
-        .input-area {
-            position: fixed; bottom: 24px; left: 24px; right: 24px;
-            display: flex; align-items: center; gap: 12px;
-        }
-
-        .input-glass {
-            flex: 1; padding: 16px 24px;
-            border: none; outline: none; background: transparent;
-            font-size: 1rem; color: var(--text-dark); font-weight: 600;
-        }
-        .input-glass::placeholder { color: var(--text-light); }
-
-        .send-btn {
-            width: 56px; height: 56px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-        }
-
-        .loading-toast {
+        /* Loading Overlay */
+        #ai-loader {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 10px 20px; font-weight: bold; display: none;
-            z-index: 100;
+            padding: 8px 20px; font-size: 12px; font-weight: 800;
+            display: none; z-index: 999;
         }
-        .loading-toast.show { display: block; }
 
+        /* Mic States */
+        .recording { background: #ff4757 !important; color: white !important; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="glass loading-toast">Đang xử lý AI...</div>
+    <div id="ai-loader" class="glass">AI ĐANG PHÂN TÍCH...</div>
 
-    <!-- Trang 1: Landing Page -->
     <div id="landing-page" class="screen active">
-        <h1 class="title-3d" id="greeting-text">Hi! Muốn note gì đó cưng?</h1>
-        <div class="glass mic-btn-huge" id="main-mic-btn" onclick="startGlobalVoiceInput()">
-            <span class="material-icons-round">mic</span>
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 40px;">HoloNotes V6</h1>
+        <div class="glass mic-trigger" id="home-mic" onclick="toggleSpeech()">
+            <i class="material-icons-round">mic</i>
         </div>
-        <p style="margin-top: 30px; font-weight: 600; opacity: 0.7; cursor: pointer;" onclick="goToWorkspace()">Chạm để vào danh sách note</p>
+        <p style="margin-top: 20px; font-weight: 600; cursor: pointer" onclick="switchPage('workspace-page')">Xem danh sách ghi chú</p>
     </div>
 
-    <!-- Trang 2: Workspace Page -->
     <div id="workspace-page" class="screen hidden">
-        <header>
-            <h1>HoloNotes</h1>
-            <p id="current-date">Hôm nay</p>
-        </header>
-
-        <div class="note-list" id="note-container">
-            <!-- Thẻ HTML render qua JS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-weight: 800;">Ghi chú</h2>
+            <i class="material-icons-round" onclick="switchPage('landing-page')" style="cursor: pointer;">home</i>
         </div>
+        
+        <div class="note-list" id="list-container"></div>
 
-        <div class="input-area">
-            <div class="glass" style="flex: 1; display: flex;">
-                <input type="text" class="input-glass" id="text-input" placeholder="Nhập việc cần làm..." onkeypress="handleKey(event)">
-            </div>
-            <!-- Nút gửi tay -->
-            <div class="glass send-btn" onclick="submitTextInput()">
-                <span class="material-icons-round">send</span>
-            </div>
-            <!-- Nút Mic -->
-            <div class="glass send-btn" id="workspace-mic-btn" onclick="startGlobalVoiceInput()">
-                <span class="material-icons-round">mic</span>
+        <div class="input-bar">
+            <input type="text" id="manual-input" placeholder="Cưng muốn dặn gì..." onkeypress="if(event.key==='Enter') handleManual()">
+            <div class="glass" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="toggleSpeech()" id="work-mic">
+                <i class="material-icons-round">mic</i>
             </div>
         </div>
     </div>
 
-    <!-- SCIPTS LÕI VOID -->
     <script>
-        // CẤU HÌNH AI PRO
-        const AI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=AIzaSyBguiessoOjSXzzM5BmZ4kd9Si3BSIg4Ng";
-        const SYSTEM_PROMPT = `Bạn là trợ lý ảo nữ miền Nam nanh nọc, lầy lội, gọi 'cưng' xưng 'tui'. Trả về duy nhất JSON: {"reply": "câu khịa", "item": "việc/món đồ", "price": số_tiền_hoặc_0, "reminderTime": "thời_gian_iso8601_nếu_có"}`;
+        const API_KEY = "AIzaSyBguiessoOjSXzzM5BmZ4kd9Si3BSIg4Ng"; // Thay key của bạn vào đây
+        const AI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        const SYSTEM_PROMPT = `Bạn là trợ lý ảo tên Holo, tính cách nanh nọc, lầy lội, xưng tui gọi cưng. Nhiệm vụ: Trích xuất thông tin từ câu nói. 
+        Nếu là nhắc việc hoặc mua đồ, trả về JSON duy nhất: {"reply": "câu khịa ngắn", "item": "tên việc", "price": số_tiền_hoặc_0}.`;
 
-        let notes = [];
-        let isListening = false;
-        let recognition = null;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let notes = JSON.parse(localStorage.getItem('holov6_data')) || [];
+        let recognition;
+        let isRecording = false;
 
-        // 1. Storage Manager (Lưu Song Song)
-        const StorageManager = {
-            saveLocal: function(dataArray) {
-                localStorage.setItem('holonotes_v6', JSON.stringify(dataArray));
-                this.syncToFirebase(dataArray); // Sync chìm
-            },
-            loadLocal: function() {
-                return JSON.parse(localStorage.getItem('holonotes_v6')) || [];
-            },
-            syncToFirebase: function(data) {
-                // Placeholder Firebase logic
-                console.log("[Firebase Placeholder] Đã đẩy dữ liệu xuyên không thành công!", data.length, "items");
-            }
-        }
-
-        // 2. Khởi tạo
-        function initApp() {
-            notes = StorageManager.loadLocal();
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            renderNotes();
-            initSpeechAPI();
-        }
-
-        // Keng Sound Effect using Web Audio API (Sạch sẽ, không cần file ngoài)
-        function playKengSound() {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // High pitch
-            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            
-            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
-        }
-
-        // 3. UI Renders
-        function renderNotes() {
-            const container = document.getElementById('note-container');
-            container.innerHTML = '';
-            notes.slice().reverse().forEach((note, reversedIndex) => {
-                const i = notes.length - 1 - reversedIndex; // Real index
-                const div = document.createElement('div');
-                div.className = `glass note-card ${note.is_done ? 'done' : ''}`;
-                
-                let metaText = `<span class="meta-tag">Ghi chú</span>`;
-                if(note.price > 0) metaText += `<span style="color:#f43f5e">${note.price.toLocaleString('vi-VN')} đ</span> `;
-                if(note.reminderTime) {
-                    const d = new Date(note.reminderTime);
-                    metaText += `⏰ ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')} ${d.getDate()}/${d.getMonth()+1}`;
-                }
-
-                div.innerHTML = `
-                    <div class="checkbox" onclick="toggleDone(${i})"></div>
-                    <div class="note-body">
-                        <p class="content">${note.item}</p>
-                        <div class="meta">${metaText}</div>
-                    </div>
-                    <div class="delete-btn material-icons-round" onclick="deleteNote(${i})">delete_outline</div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function toggleDone(index) {
-            notes[index].is_done = !notes[index].is_done;
-            StorageManager.saveLocal(notes);
-            renderNotes();
-        }
-
-        function deleteNote(index) {
-            notes.splice(index, 1);
-            StorageManager.saveLocal(notes);
-            renderNotes();
-        }
-
-        function goToWorkspace() {
-            document.getElementById('landing-page').classList.replace('active', 'hidden');
-            document.getElementById('workspace-page').classList.replace('hidden', 'active');
-        }
-
-        function toggleLoader(show) {
-            const el = document.getElementById('loading');
-            show ? el.classList.add('show') : el.classList.remove('show');
-        }
-
-        // 4. Lõi Ghi Âm
-        function initSpeechAPI() {
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechRec) { alert("Trình duyệt không hỗ trợ Web Speech API."); return; }
-            recognition = new SpeechRec();
+        // Khởi tạo Speech
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
             recognition.lang = 'vi-VN';
-            recognition.continuous = false;
-            
-            recognition.onstart = () => { UI_setListeningState(true); };
-            recognition.onend = () => { UI_setListeningState(false); };
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                processUserInput(text);
-            };
+            recognition.onresult = (e) => processAI(e.results[0][0].transcript);
+            recognition.onend = () => setMicState(false);
         }
 
-        function startGlobalVoiceInput() {
-            if(!recognition) return;
-            if(isListening) { recognition.stop(); }
-            else { recognition.start(); }
+        function switchPage(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('active');
         }
 
-        function UI_setListeningState(state) {
-            isListening = state;
-            const b1 = document.getElementById('main-mic-btn');
-            const b2 = document.getElementById('workspace-mic-btn');
+        function setMicState(state) {
+            isRecording = state;
+            const icon = isRecording ? 'graphic_eq' : 'mic';
+            document.getElementById('home-mic').innerHTML = `<i class="material-icons-round">${icon}</i>`;
+            document.getElementById('work-mic').innerHTML = `<i class="material-icons-round">${icon}</i>`;
             if(state) {
-                b1.classList.add('mic-recording'); b2.classList.add('mic-recording');
-                document.getElementById('greeting-text').innerText = "Đang rình nghe cưng nói...";
+                document.getElementById('home-mic').classList.add('recording');
+                document.getElementById('work-mic').classList.add('recording');
             } else {
-                b1.classList.remove('mic-recording'); b2.classList.remove('mic-recording');
-                document.getElementById('greeting-text').innerText = "Hi! Muốn note gì đó cưng?";
+                document.getElementById('home-mic').classList.remove('recording');
+                document.getElementById('work-mic').classList.remove('recording');
             }
         }
 
-        // 5. Submit tay
-        function handleKey(e) { if(e.key === 'Enter') submitTextInput(); }
-        function submitTextInput() {
-            const val = document.getElementById('text-input').value.trim();
-            if(val) {
-                document.getElementById('text-input').value = '';
-                processUserInput(val);
-            }
+        function toggleSpeech() {
+            if(isRecording) recognition.stop();
+            else { recognition.start(); setMicState(true); }
         }
 
-        // 6. Xử lý Logic AI (Auto-check & Gemini API)
-        async function processUserInput(inputStr) {
-            goToWorkspace(); // Nhảy trang nếu đang đứng ở Home
-            
-            const lowerStr = inputStr.toLowerCase();
-            
-            // Xử lý XONG / HOÀN THÀNH cự ly gần nhanh nhất
-            if(lowerStr.includes("xong") || lowerStr.includes("rồi") || lowerStr.includes("đã hoàn thành")) {
-                const target = lowerStr.replace("đã hoàn thành", "").replace("xong", "").replace("rồi", "").replace("đã", "").trim();
-                let found = false;
-                for(let i=0; i<notes.length; i++) {
-                    if(!notes[i].is_done && target && notes[i].item.toLowerCase().includes(target)) {
-                        notes[i].is_done = true; found = true;
-                        StorageManager.saveLocal(notes); renderNotes();
-                        responsiveVoice.speak("Ok, đã tích gạch ngang cho cưng rồi đó nha!", "Vietnamese Female");
-                        break;
-                    }
-                }
-                if(found) return; // Nếu tìm thấy thì dứt luôn
-            }
+        async function handleManual() {
+            const val = document.getElementById('manual-input').value;
+            if(!val) return;
+            document.getElementById('manual-input').value = '';
+            processAI(val);
+        }
 
-            // Gọi API Gemini
-            toggleLoader(true);
+        async function processAI(text) {
+            switchPage('workspace-page');
+            document.getElementById('ai-loader').style.display = 'block';
+
             try {
-                const res = await fetch(AI_URL, {
+                const response = await fetch(AI_URL, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                        contents: [{ parts: [{ text: `Câu nói: "${inputStr}"` }] }]
+                        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\nCâu nói: "${text}"` }] }]
                     })
                 });
-                const data = await res.json();
                 
-                let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-                rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                const data = await response.json();
+                let cleanJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '');
+                const res = JSON.parse(cleanJson);
+
+                notes.push({ id: Date.now(), item: res.item, price: res.price, done: false });
+                save();
+                render();
                 
-                const aiResult = JSON.parse(rawText);
-                
-                // Add note
-                notes.push({
-                    id: Date.now(),
-                    item: aiResult.item || inputStr,
-                    price: aiResult.price || 0,
-                    reminderTime: aiResult.reminderTime || null,
-                    is_done: false,
-                    createdAt: new Date().toISOString()
-                });
-                StorageManager.saveLocal(notes);
-                renderNotes();
+                responsiveVoice.speak(res.reply, "Vietnamese Female");
+                playDing();
 
-                // TTS nanh nọc
-                if(aiResult.reply) {
-                    responsiveVoice.speak(aiResult.reply, "Vietnamese Female");
-                }
-
-                // Phát tiếng "Keng" nếu có ghi nhận tiền bạc hoặc add thành công!
-                setTimeout(() => playKengSound(), 500);
-
-            } catch (err) {
-                console.error(err);
-                // Fallback cứu hộ
-                notes.push({ id: Date.now(), item: inputStr, price: 0, is_done: false, createdAt: new Date().toISOString() });
-                StorageManager.saveLocal(notes);
-                renderNotes();
-
-                // Lên tiếng chửi khi hết Quota AI
-                responsiveVoice.speak("Ê hết tiền nuôi tui rồi hả cưng, mạng chập cheng tui lưu đại vô sổ luôn á nha!", "Vietnamese Female");
-                setTimeout(() => playKengSound(), 500);
+            } catch (e) {
+                notes.push({ id: Date.now(), item: text, price: 0, done: false });
+                save(); render();
+                responsiveVoice.speak("Mạng lag hay gì rồi cưng, tui lưu đại vô nè!", "Vietnamese Female");
             }
-            toggleLoader(false);
+            document.getElementById('ai-loader').style.display = 'none';
         }
 
-        // Bùmm
-        window.onload = initApp;
+        function render() {
+            const container = document.getElementById('list-container');
+            container.innerHTML = notes.map((n, i) => `
+                <div class="glass note-card ${n.done ? 'done' : ''}">
+                    <div class="checkbox" onclick="toggle(${i})"></div>
+                    <div style="flex:1">
+                        <div class="note-text" style="font-weight:700">${n.item}</div>
+                        ${n.price ? `<div style="font-size:12px; color:#ef4444; font-weight:800">${n.price.toLocaleString()}đ</div>` : ''}
+                    </div>
+                    <i class="material-icons-round" style="opacity:0.3; cursor:pointer" onclick="del(${i})">delete</i>
+                </div>
+            `).join('');
+        }
 
+        function toggle(i) { notes[i].done = !notes[i].done; save(); render(); }
+        function del(i) { notes.splice(i, 1); save(); render(); }
+        function save() { localStorage.setItem('holov6_data', JSON.stringify(notes)); }
+
+        function playDing() {
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+            osc.frequency.value = 880;
+            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+            osc.start(); osc.stop(ctx.currentTime + 0.5);
+        }
+
+        window.onload = render;
     </script>
 </body>
 </html>
