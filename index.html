@@ -2,248 +2,111 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoloNotes V6 Pro Immortal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Clean Notes</title>
+    <!-- Thêm font Inter và Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.2);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-dark: #0f172a;
-            --accent: #6366f1;
-        }
-
-        body, html {
-            margin: 0; padding: 0;
-            font-family: 'Inter', sans-serif;
-            height: 100%; width: 100%;
-            overflow: hidden;
-            color: var(--text-dark);
-        }
-
-        body {
-            background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #fbc2eb, #a18cd1);
-            background-size: 400% 400%;
-            animation: gradientBG 20s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        }
-
-        .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column;
-            padding: 24px; box-sizing: border-box;
-        }
-
-        .hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
-        .active { opacity: 1; transform: translateY(0); pointer-events: auto; }
-
-        /* Landing Page */
-        #landing-page { justify-content: center; align-items: center; text-align: center; }
-        
-        .mic-trigger {
-            width: 120px; height: 120px;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: transform 0.3s ease;
-        }
-        .mic-trigger:active { transform: scale(0.9); }
-        .mic-trigger i { font-size: 48px; }
-
-        /* Workspace */
-        .note-list { flex: 1; overflow-y: auto; padding-top: 10px; }
-        .note-card {
-            padding: 16px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 15px;
-            animation: slideIn 0.4s ease forwards;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-
-        .checkbox {
-            width: 24px; height: 24px; border-radius: 8px;
-            border: 2px solid var(--accent); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .done .checkbox { background: var(--accent); }
-        .done .checkbox::after { content: 'check'; font-family: 'Material Icons Round'; color: white; font-size: 18px; }
-        .done .note-text { text-decoration: line-through; opacity: 0.6; }
-
-        .input-bar {
-            display: flex; gap: 10px; margin-top: 10px;
-        }
-        .input-bar input {
-            flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            padding: 15px 20px; border-radius: 20px; outline: none; font-weight: 600;
-        }
-
-        /* Loading Overlay */
-        #ai-loader {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 8px 20px; font-size: 12px; font-weight: 800;
-            display: none; z-index: 999;
-        }
-
-        /* Mic States */
-        .recording { background: #ff4757 !important; color: white !important; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
-    </style>
+    <!-- Link tới file CSS bên ngoài -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="ai-loader" class="glass">AI ĐANG PHÂN TÍCH...</div>
+    <div class="toast" id="toast">Ghi âm thành công!</div>
 
-    <div id="landing-page" class="screen active">
-        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 40px;">HoloNotes V6</h1>
-        <div class="glass mic-trigger" id="home-mic" onclick="toggleSpeech()">
-            <i class="material-icons-round">mic</i>
+    <!-- HOME VIEW -->
+    <div id="home-view">
+        <header>
+            <h1 id="greeting">Ghi chú</h1>
+        </header>
+
+        <!-- Work Section -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-title">Work</span>
+                <button class="add-quick-btn" onclick="openAddModal('Work')"><span class="material-icons-round">add</span></button>
+            </div>
+            <div class="note-list" id="list-Work"></div>
         </div>
-        <p style="margin-top: 20px; font-weight: 600; cursor: pointer" onclick="switchPage('workspace-page')">Xem danh sách ghi chú</p>
+
+        <!-- Study Section -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-title">Study</span>
+                <button class="add-quick-btn" onclick="openAddModal('Study')"><span class="material-icons-round">add</span></button>
+            </div>
+            <div class="note-list" id="list-Study"></div>
+        </div>
+
+        <!-- Personal Section -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-title">Personal</span>
+                <button class="add-quick-btn" onclick="openAddModal('Personal')"><span class="material-icons-round">add</span></button>
+            </div>
+            <div class="note-list" id="list-Personal"></div>
+        </div>
     </div>
 
-    <div id="workspace-page" class="screen hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; font-weight: 800;">Ghi chú</h2>
-            <i class="material-icons-round" onclick="switchPage('landing-page')" style="cursor: pointer;">home</i>
+    <!-- SETTINGS VIEW -->
+    <div id="settings-view">
+        <header style="padding: 30px 0 20px;">
+            <h1>Cài đặt</h1>
+        </header>
+        <div class="settings-list">
+            <div class="settings-item">
+                <span>Chế độ Tối (Dark Mode)</span>
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
-        
-        <div class="note-list" id="list-container"></div>
+        <p style="text-align:center; color: var(--text-muted); font-size: 13px; margin-top:20px;">Phiên bản 1.0 - Clean Notes</p>
+    </div>
 
-        <div class="input-bar">
-            <input type="text" id="manual-input" placeholder="Cưng muốn dặn gì..." onkeypress="if(event.key==='Enter') handleManual()">
-            <div class="glass" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="toggleSpeech()" id="work-mic">
-                <i class="material-icons-round">mic</i>
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+        <div class="tab-item active" id="tab-home" onclick="switchTab('home')">
+            <span class="material-icons-round">description</span>
+            <span class="tab-label">Home</span>
+        </div>
+        <div class="tab-item" onclick="openAddModal('Personal')">
+            <span class="material-icons-round">add_circle</span>
+            <span class="tab-label">Add</span>
+        </div>
+        <div class="tab-item" id="tab-settings" onclick="switchTab('settings')">
+            <span class="material-icons-round">settings</span>
+            <span class="tab-label">Settings</span>
+        </div>
+    </div>
+
+    <!-- ADD NOTE MODAL -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-card">
+            <div class="modal-content">
+                <p class="modal-title">Ghi chú mới</p>
+                <p class="modal-desc" id="mic-status">Nhập chữ hoặc dùng giọng nói</p>
+                <input type="text" id="note-input" class="modal-input" placeholder="Nội dung ghi chú..." autocomplete="off">
+                <select id="note-category" class="modal-select">
+                    <option value="Work">Work</option>
+                    <option value="Study">Study</option>
+                    <option value="Personal">Personal</option>
+                </select>
+                <div class="mic-wrapper">
+                    <button class="mic-btn-main" id="mic-btn" onclick="toggleVoice()">
+                        <span class="material-icons-round">mic</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn destructive" onclick="closeModal()">Hủy</button>
+                <button class="modal-btn" onclick="saveNoteFromModal()">Thêm</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_KEY = "AIzaSyBguiessoOjSXzzM5BmZ4kd9Si3BSIg4Ng"; // Thay key của bạn vào đây
-        const AI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-        const SYSTEM_PROMPT = `Bạn là trợ lý ảo tên Holo, tính cách nanh nọc, lầy lội, xưng tui gọi cưng. Nhiệm vụ: Trích xuất thông tin từ câu nói. 
-        Nếu là nhắc việc hoặc mua đồ, trả về JSON duy nhất: {"reply": "câu khịa ngắn", "item": "tên việc", "price": số_tiền_hoặc_0}.`;
-
-        let notes = JSON.parse(localStorage.getItem('holov6_data')) || [];
-        let recognition;
-        let isRecording = false;
-
-        // Khởi tạo Speech
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.lang = 'vi-VN';
-            recognition.onresult = (e) => processAI(e.results[0][0].transcript);
-            recognition.onend = () => setMicState(false);
-        }
-
-        function switchPage(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('active');
-        }
-
-        function setMicState(state) {
-            isRecording = state;
-            const icon = isRecording ? 'graphic_eq' : 'mic';
-            document.getElementById('home-mic').innerHTML = `<i class="material-icons-round">${icon}</i>`;
-            document.getElementById('work-mic').innerHTML = `<i class="material-icons-round">${icon}</i>`;
-            if(state) {
-                document.getElementById('home-mic').classList.add('recording');
-                document.getElementById('work-mic').classList.add('recording');
-            } else {
-                document.getElementById('home-mic').classList.remove('recording');
-                document.getElementById('work-mic').classList.remove('recording');
-            }
-        }
-
-        function toggleSpeech() {
-            if(isRecording) recognition.stop();
-            else { recognition.start(); setMicState(true); }
-        }
-
-        async function handleManual() {
-            const val = document.getElementById('manual-input').value;
-            if(!val) return;
-            document.getElementById('manual-input').value = '';
-            processAI(val);
-        }
-
-        async function processAI(text) {
-            switchPage('workspace-page');
-            document.getElementById('ai-loader').style.display = 'block';
-
-            try {
-                const response = await fetch(AI_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\nCâu nói: "${text}"` }] }]
-                    })
-                });
-                
-                const data = await response.json();
-                let cleanJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '');
-                const res = JSON.parse(cleanJson);
-
-                notes.push({ id: Date.now(), item: res.item, price: res.price, done: false });
-                save();
-                render();
-                
-                responsiveVoice.speak(res.reply, "Vietnamese Female");
-                playDing();
-
-            } catch (e) {
-                notes.push({ id: Date.now(), item: text, price: 0, done: false });
-                save(); render();
-                responsiveVoice.speak("Mạng lag hay gì rồi cưng, tui lưu đại vô nè!", "Vietnamese Female");
-            }
-            document.getElementById('ai-loader').style.display = 'none';
-        }
-
-        function render() {
-            const container = document.getElementById('list-container');
-            container.innerHTML = notes.map((n, i) => `
-                <div class="glass note-card ${n.done ? 'done' : ''}">
-                    <div class="checkbox" onclick="toggle(${i})"></div>
-                    <div style="flex:1">
-                        <div class="note-text" style="font-weight:700">${n.item}</div>
-                        ${n.price ? `<div style="font-size:12px; color:#ef4444; font-weight:800">${n.price.toLocaleString()}đ</div>` : ''}
-                    </div>
-                    <i class="material-icons-round" style="opacity:0.3; cursor:pointer" onclick="del(${i})">delete</i>
-                </div>
-            `).join('');
-        }
-
-        function toggle(i) { notes[i].done = !notes[i].done; save(); render(); }
-        function del(i) { notes.splice(i, 1); save(); render(); }
-        function save() { localStorage.setItem('holov6_data', JSON.stringify(notes)); }
-
-        function playDing() {
-            const ctx = new AudioContext();
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.connect(g); g.connect(ctx.destination);
-            osc.frequency.value = 880;
-            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-            osc.start(); osc.stop(ctx.currentTime + 0.5);
-        }
-
-        window.onload = render;
-    </script>
+    <!-- Link tới file Javascript bên ngoài -->
+    <script src="script.js"></script>
 </body>
 </html>
